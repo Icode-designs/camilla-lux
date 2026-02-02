@@ -281,7 +281,12 @@ function CollectionContent() {
   }, []);
 
   const categories = ["All", "Handbags", "Footwear", "Sneakers", "Perfumes"];
-  const priceRanges = ["All Prices", "Under ₦100", "₦100 - ₦200", "₦200+"];
+  const priceRanges = [
+    "All Prices",
+    "Under ₦5000",
+    "₦5000 - ₦10000",
+    "₦10000+",
+  ];
 
   const filteredProducts = products.filter((product) => {
     const matchCategory =
