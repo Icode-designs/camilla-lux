@@ -288,10 +288,10 @@ function CollectionContent() {
       selectedCategory === "all" ||
       product.category.toLowerCase() === selectedCategory.toLowerCase();
     let matchPrice = true;
-    if (selectedPrice === "under ₦100") matchPrice = product.price < 100;
-    else if (selectedPrice === "₦100 - ₦200")
+    if (selectedPrice === "under ₦5000") matchPrice = product.price < 100;
+    else if (selectedPrice === "₦5000 - ₦10000")
       matchPrice = product.price >= 100 && product.price <= 200;
-    else if (selectedPrice === "₦200+") matchPrice = product.price > 200;
+    else if (selectedPrice === "₦10000+") matchPrice = product.price > 200;
 
     const matchSearch =
       !searchQuery ||
