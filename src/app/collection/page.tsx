@@ -1,46 +1,48 @@
-'use client';
+"use client";
 
-import styled from 'styled-components';
-import { useState, useEffect, Suspense } from 'react';
-import Link from 'next/link';
-import { 
-  Card, 
-  CardImage, 
-  CardContent, 
-  CardTitle, 
-  CardPrice, 
+import styled from "styled-components";
+import { useState, useEffect, Suspense } from "react";
+import Link from "next/link";
+import {
+  Card,
+  CardImage,
+  CardContent,
+  CardTitle,
+  CardPrice,
   Price,
   OriginalPrice,
-  Badge 
-} from '@/components/Card';
-import { FiGrid, FiList, FiFilter, FiX } from 'react-icons/fi';
-import { useSearchParams, useRouter } from 'next/navigation';
+  Badge,
+} from "@/components/Card";
+import { FiGrid, FiList, FiFilter, FiX } from "react-icons/fi";
+import { useSearchParams, useRouter } from "next/navigation";
 
 const PageContainer = styled.div`
   max-width: 1440px;
   margin: 0 auto;
-  padding: ${({ theme }) => theme.spacing['4xl']} ${({ theme }) => theme.spacing.xl};
+  padding: ${({ theme }) => theme.spacing["4xl"]}
+    ${({ theme }) => theme.spacing.xl};
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: ${({ theme }) => theme.spacing.xl} ${({ theme }) => theme.spacing.md};
+    padding: ${({ theme }) => theme.spacing.xl}
+      ${({ theme }) => theme.spacing.md};
   }
 `;
 
 const PageHeader = styled.div`
   text-align: center;
-  margin-bottom: ${({ theme }) => theme.spacing['4xl']};
+  margin-bottom: ${({ theme }) => theme.spacing["4xl"]};
 `;
 
 const PageTitle = styled.h1`
   font-family: ${({ theme }) => theme.typography.fonts.heading};
-  font-size: ${({ theme }) => theme.typography.sizes['5xl']};
+  font-size: ${({ theme }) => theme.typography.sizes["5xl"]};
   font-weight: ${({ theme }) => theme.typography.weights.bold};
   margin-bottom: ${({ theme }) => theme.spacing.md};
   text-transform: uppercase;
   letter-spacing: 2px;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    font-size: ${({ theme }) => theme.typography.sizes['3xl']};
+    font-size: ${({ theme }) => theme.typography.sizes["3xl"]};
   }
 `;
 
@@ -54,7 +56,7 @@ const PageDescription = styled.p`
 const CollectionLayout = styled.div`
   display: grid;
   grid-template-columns: 250px 1fr;
-  gap: ${({ theme }) => theme.spacing['3xl']};
+  gap: ${({ theme }) => theme.spacing["3xl"]};
 
   @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
     grid-template-columns: 1fr;
@@ -66,12 +68,13 @@ const Sidebar = styled.aside<{ $isOpen: boolean }>`
   @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
     position: fixed;
     top: 0;
-    left: ${({ $isOpen }) => ($isOpen ? '0' : '-100%')};
+    left: ${({ $isOpen }) => ($isOpen ? "0" : "-100%")};
     width: 80%;
     max-width: 300px;
     height: 100vh;
     background-color: ${({ theme }) => theme.colors.white};
-    padding: ${({ theme }) => theme.spacing['3xl']} ${({ theme }) => theme.spacing.xl};
+    padding: ${({ theme }) => theme.spacing["3xl"]}
+      ${({ theme }) => theme.spacing.xl};
     box-shadow: ${({ theme }) => theme.shadows.xl};
     transition: left ${({ theme }) => theme.transitions.base};
     z-index: ${({ theme }) => theme.zIndex.modal};
@@ -80,7 +83,7 @@ const Sidebar = styled.aside<{ $isOpen: boolean }>`
 `;
 
 const FilterSection = styled.div`
-  margin-bottom: ${({ theme }) => theme.spacing['2xl']};
+  margin-bottom: ${({ theme }) => theme.spacing["2xl"]};
 `;
 
 const FilterTitle = styled.h3`
@@ -98,12 +101,13 @@ const FilterOption = styled.button<{ $isActive: boolean }>`
   text-align: left;
   padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
   margin-bottom: ${({ theme }) => theme.spacing.xs};
-  background-color: ${({ $isActive, theme }) => 
-    $isActive ? theme.colors.black : 'transparent'};
-  color: ${({ $isActive, theme }) => 
+  background-color: ${({ $isActive, theme }) =>
+    $isActive ? theme.colors.black : "transparent"};
+  color: ${({ $isActive, theme }) =>
     $isActive ? theme.colors.gold : theme.colors.text.primary};
-  border: 1px solid ${({ $isActive, theme }) => 
-    $isActive ? theme.colors.black : 'transparent'};
+  border: 1px solid
+    ${({ $isActive, theme }) =>
+      $isActive ? theme.colors.black : "transparent"};
   font-size: ${({ theme }) => theme.typography.sizes.sm};
   transition: all ${({ theme }) => theme.transitions.fast};
 
@@ -192,9 +196,9 @@ const ViewToggle = styled.div`
 
 const ViewButton = styled.button<{ $isActive: boolean }>`
   padding: ${({ theme }) => theme.spacing.sm};
-  background-color: ${({ $isActive, theme }) => 
-    $isActive ? theme.colors.black : 'transparent'};
-  color: ${({ $isActive, theme }) => 
+  background-color: ${({ $isActive, theme }) =>
+    $isActive ? theme.colors.black : "transparent"};
+  color: ${({ $isActive, theme }) =>
     $isActive ? theme.colors.gold : theme.colors.text.primary};
   transition: all ${({ theme }) => theme.transitions.fast};
 
@@ -208,21 +212,21 @@ const ViewButton = styled.button<{ $isActive: boolean }>`
   }
 `;
 
-const ProductGrid = styled.div<{ $viewMode: 'grid' | 'list' }>`
+const ProductGrid = styled.div<{ $viewMode: "grid" | "list" }>`
   display: grid;
-  grid-template-columns: ${({ $viewMode }) => 
-    $viewMode === 'grid' ? 'repeat(auto-fill, minmax(280px, 1fr))' : '1fr'};
+  grid-template-columns: ${({ $viewMode }) =>
+    $viewMode === "grid" ? "repeat(auto-fill, minmax(280px, 1fr))" : "1fr"};
   gap: ${({ theme }) => theme.spacing.xl};
 
   @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    grid-template-columns: ${({ $viewMode }) => 
-      $viewMode === 'grid' ? 'repeat(auto-fill, minmax(200px, 1fr))' : '1fr'};
+    grid-template-columns: ${({ $viewMode }) =>
+      $viewMode === "grid" ? "repeat(auto-fill, minmax(200px, 1fr))" : "1fr"};
     gap: ${({ theme }) => theme.spacing.md};
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    grid-template-columns: ${({ $viewMode }) => 
-      $viewMode === 'grid' ? 'repeat(2, 1fr)' : '1fr'};
+    grid-template-columns: ${({ $viewMode }) =>
+      $viewMode === "grid" ? "repeat(2, 1fr)" : "1fr"};
     gap: ${({ theme }) => theme.spacing.sm};
   }
 `;
@@ -235,40 +239,40 @@ const Overlay = styled.div<{ $isOpen: boolean }>`
     position: fixed;
     inset: 0;
     background-color: rgba(0, 0, 0, 0.5);
-    opacity: ${({ $isOpen }) => ($isOpen ? '1' : '0')};
-    visibility: ${({ $isOpen }) => ($isOpen ? 'visible' : 'hidden')};
+    opacity: ${({ $isOpen }) => ($isOpen ? "1" : "0")};
+    visibility: ${({ $isOpen }) => ($isOpen ? "visible" : "hidden")};
     transition: all ${({ theme }) => theme.transitions.base};
     z-index: ${({ theme }) => theme.zIndex.overlay};
   }
 `;
 
-import { supabase } from '@/lib/supabase';
+import { supabase } from "@/lib/supabase";
 
 function CollectionContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const searchQuery = searchParams.get('q') || '';
-  
+  const searchQuery = searchParams.get("q") || "";
+
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedPrice, setSelectedPrice] = useState('all');
-  const [sortBy, setSortBy] = useState('featured');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedPrice, setSelectedPrice] = useState("all");
+  const [sortBy, setSortBy] = useState("featured");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [filterOpen, setFilterOpen] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const { data, error } = await supabase
-          .from('products')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
+          .from("products")
+          .select("*")
+          .order("created_at", { ascending: false });
+
         if (error) throw error;
         setProducts(data || []);
       } catch (error) {
-        console.error('Error fetching products:', error);
+        console.error("Error fetching products:", error);
       } finally {
         setLoading(false);
       }
@@ -276,42 +280,71 @@ function CollectionContent() {
     fetchProducts();
   }, []);
 
-  const categories = ['All', 'Handbags', 'Footwear', 'Sneakers', 'Perfumes'];
-  const priceRanges = ['All Prices', 'Under $100', '$100 - $200', '$200+'];
+  const categories = ["All", "Handbags", "Footwear", "Sneakers", "Perfumes"];
+  const priceRanges = ["All Prices", "Under ₦100", "₦100 - ₦200", "₦200+"];
 
-  const filteredProducts = products.filter(product => {
-    const matchCategory = selectedCategory === 'all' || product.category.toLowerCase() === selectedCategory.toLowerCase();
+  const filteredProducts = products.filter((product) => {
+    const matchCategory =
+      selectedCategory === "all" ||
+      product.category.toLowerCase() === selectedCategory.toLowerCase();
     let matchPrice = true;
-    if (selectedPrice === 'under $100') matchPrice = product.price < 100;
-    else if (selectedPrice === '$100 - $200') matchPrice = product.price >= 100 && product.price <= 200;
-    else if (selectedPrice === '$200+') matchPrice = product.price > 200;
-    
-    const matchSearch = !searchQuery || 
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    if (selectedPrice === "under ₦100") matchPrice = product.price < 100;
+    else if (selectedPrice === "₦100 - ₦200")
+      matchPrice = product.price >= 100 && product.price <= 200;
+    else if (selectedPrice === "₦200+") matchPrice = product.price > 200;
+
+    const matchSearch =
+      !searchQuery ||
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.description.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     return matchCategory && matchPrice && matchSearch;
   });
 
-  if (loading) return <PageContainer><p>Loading collection...</p></PageContainer>;
+  if (loading)
+    return (
+      <PageContainer>
+        <p>Loading collection...</p>
+      </PageContainer>
+    );
 
   return (
     <PageContainer>
       <PageHeader>
         <PageTitle>Our Collection</PageTitle>
         {searchQuery && (
-          <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-            <p>Results for "<strong>{searchQuery}</strong>"</p>
-            <button 
-              onClick={() => router.push('/collection')}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', background: 'none', border: 'none', color: '#666', cursor: 'pointer', textDecoration: 'underline' }}
+          <div
+            style={{
+              marginBottom: "1rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.5rem",
+            }}
+          >
+            <p>
+              Results for "<strong>{searchQuery}</strong>"
+            </p>
+            <button
+              onClick={() => router.push("/collection")}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.25rem",
+                background: "none",
+                border: "none",
+                color: "#666",
+                cursor: "pointer",
+                textDecoration: "underline",
+              }}
             >
               <FiX size={14} /> Clear
             </button>
           </div>
         )}
         <PageDescription>
-          Discover our curated selection of premium fashion pieces designed for the modern individual.
+          Discover our curated selection of premium fashion pieces designed for
+          the modern individual.
         </PageDescription>
       </PageHeader>
 
@@ -354,15 +387,20 @@ function CollectionContent() {
 
         <MainContent>
           <Toolbar>
-            <ResultCount>Showing {filteredProducts.length} products</ResultCount>
-            
+            <ResultCount>
+              Showing {filteredProducts.length} products
+            </ResultCount>
+
             <ToolbarActions>
               <FilterToggle onClick={() => setFilterOpen(true)}>
                 <FiFilter />
                 Filters
               </FilterToggle>
 
-              <SortSelect value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+              <SortSelect
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+              >
                 <option value="featured">Featured</option>
                 <option value="newest">Newest</option>
                 <option value="price-low">Price: Low to High</option>
@@ -370,16 +408,16 @@ function CollectionContent() {
               </SortSelect>
 
               <ViewToggle>
-                <ViewButton 
-                  $isActive={viewMode === 'grid'} 
-                  onClick={() => setViewMode('grid')}
+                <ViewButton
+                  $isActive={viewMode === "grid"}
+                  onClick={() => setViewMode("grid")}
                   aria-label="Grid View"
                 >
                   <FiGrid />
                 </ViewButton>
-                <ViewButton 
-                  $isActive={viewMode === 'list'} 
-                  onClick={() => setViewMode('list')}
+                <ViewButton
+                  $isActive={viewMode === "list"}
+                  onClick={() => setViewMode("list")}
                   aria-label="List View"
                 >
                   <FiList />
@@ -398,9 +436,9 @@ function CollectionContent() {
                   <CardContent>
                     <CardTitle>{product.name}</CardTitle>
                     <CardPrice>
-                      <Price>${product.price}</Price>
+                      <Price>₦{product.price}</Price>
                       {product.original_price && (
-                        <OriginalPrice>${product.original_price}</OriginalPrice>
+                        <OriginalPrice>₦{product.original_price}</OriginalPrice>
                       )}
                     </CardPrice>
                   </CardContent>
@@ -408,7 +446,9 @@ function CollectionContent() {
               </Link>
             ))}
           </ProductGrid>
-          {filteredProducts.length === 0 && <p>No products found matching your criteria.</p>}
+          {filteredProducts.length === 0 && (
+            <p>No products found matching your criteria.</p>
+          )}
         </MainContent>
       </CollectionLayout>
 
@@ -419,7 +459,13 @@ function CollectionContent() {
 
 export default function CollectionPage() {
   return (
-    <Suspense fallback={<PageContainer><p>Loading...</p></PageContainer>}>
+    <Suspense
+      fallback={
+        <PageContainer>
+          <p>Loading...</p>
+        </PageContainer>
+      }
+    >
       <CollectionContent />
     </Suspense>
   );
