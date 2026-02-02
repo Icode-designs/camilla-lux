@@ -575,7 +575,7 @@ export default function HomePage() {
                   </CardImage>
                   <CardContent>
                     <CardTitle>{product.name}</CardTitle>
-                    <PriceLabel>${product.price}</PriceLabel>
+                    <PriceLabel>₦{product.price}</PriceLabel>
                     <Button as="div" variant="primary" size="medium" $fullwidth>
                       View Product
                     </Button>
