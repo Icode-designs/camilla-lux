@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { supabase } from '@/lib/supabase';
+import { useState, useEffect } from "react";
+import styled from "styled-components";
+import { supabase } from "@/lib/supabase";
 
 const Form = styled.form`
   display: flex;
@@ -71,15 +71,19 @@ interface ProductFormProps {
   buttonText: string;
 }
 
-export default function ProductForm({ initialData, onSubmit, buttonText }: ProductFormProps) {
+export default function ProductForm({
+  initialData,
+  onSubmit,
+  buttonText,
+}: ProductFormProps) {
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    original_price: '',
-    category: 'handbags',
-    badge: '',
-    image: '',
+    name: "",
+    description: "",
+    price: "",
+    original_price: "",
+    category: "handbags",
+    badge: "",
+    image: "",
   });
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -89,24 +93,28 @@ export default function ProductForm({ initialData, onSubmit, buttonText }: Produ
       setFormData({
         ...initialData,
         price: initialData.price.toString(),
-        original_price: initialData.original_price?.toString() || '',
+        original_price: initialData.original_price?.toString() || "",
       });
     } else {
       setFormData({
-        name: '',
-        description: '',
-        price: '',
-        original_price: '',
-        category: 'handbags',
-        badge: '',
-        image: '',
+        name: "",
+        description: "",
+        price: "",
+        original_price: "",
+        category: "handbags",
+        badge: "",
+        image: "",
       });
     }
   }, [initialData]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,18 +124,18 @@ export default function ProductForm({ initialData, onSubmit, buttonText }: Produ
   };
 
   const uploadToSupabase = async (file: File) => {
-    const fileExt = file.name.split('.').pop();
+    const fileExt = file.name.split(".").pop();
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
     const filePath = fileName;
 
     const { error: uploadError } = await supabase.storage
-      .from('product-images')
+      .from("product-images")
       .upload(filePath, file);
 
     if (uploadError) throw uploadError;
 
     const { data } = supabase.storage
-      .from('product-images')
+      .from("product-images")
       .getPublicUrl(filePath);
 
     return data.publicUrl;
@@ -141,18 +149,20 @@ export default function ProductForm({ initialData, onSubmit, buttonText }: Produ
       if (imageFile) {
         imageUrl = await uploadToSupabase(imageFile);
       }
-      
+
       const submissionData = {
         ...formData,
         image: imageUrl,
         price: parseFloat(formData.price),
-        original_price: formData.original_price ? parseFloat(formData.original_price) : null,
+        original_price: formData.original_price
+          ? parseFloat(formData.original_price)
+          : null,
       };
-      
+
       await onSubmit(submissionData);
     } catch (error: any) {
-      console.error('Error submitting form:', error.message || error);
-      alert('Failed to save product: ' + (error.message || 'Unknown error'));
+      console.error("Error submitting form:", error.message || error);
+      alert("Failed to save product: " + (error.message || "Unknown error"));
     } finally {
       setLoading(false);
     }
@@ -162,46 +172,50 @@ export default function ProductForm({ initialData, onSubmit, buttonText }: Produ
     <Form onSubmit={handleSubmit}>
       <FormGroup>
         <Label>Product Name</Label>
-        <Input 
-          name="name" 
-          value={formData.name} 
-          onChange={handleChange} 
-          required 
+        <Input
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          required
         />
       </FormGroup>
       <FormGroup>
         <Label>Description</Label>
-        <TextArea 
-          name="description" 
-          value={formData.description} 
-          onChange={handleChange} 
-          required 
+        <TextArea
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          required
         />
       </FormGroup>
       <FormGroup>
-        <Label>Price ($)</Label>
-        <Input 
-          type="number" 
+        <Label>Price (₦)</Label>
+        <Input
+          type="number"
           step="0.01"
-          name="price" 
-          value={formData.price} 
-          onChange={handleChange} 
-          required 
+          name="price"
+          value={formData.price}
+          onChange={handleChange}
+          required
         />
       </FormGroup>
       <FormGroup>
-        <Label>Original Price ($) - Optional</Label>
-        <Input 
-          type="number" 
+        <Label>Original Price (₦) - Optional</Label>
+        <Input
+          type="number"
           step="0.01"
-          name="original_price" 
-          value={formData.original_price} 
-          onChange={handleChange} 
+          name="original_price"
+          value={formData.original_price}
+          onChange={handleChange}
         />
       </FormGroup>
       <FormGroup>
         <Label>Category</Label>
-        <Select name="category" value={formData.category} onChange={handleChange}>
+        <Select
+          name="category"
+          value={formData.category}
+          onChange={handleChange}
+        >
           <option value="handbags">Handbags</option>
           <option value="footwear">Footwear</option>
           <option value="sneakers">Sneakers</option>
@@ -210,29 +224,23 @@ export default function ProductForm({ initialData, onSubmit, buttonText }: Produ
       </FormGroup>
       <FormGroup>
         <Label>Badge (e.g., Sale, New) - Optional</Label>
-        <Input 
-          name="badge" 
-          value={formData.badge} 
-          onChange={handleChange} 
-        />
+        <Input name="badge" value={formData.badge} onChange={handleChange} />
       </FormGroup>
       <FormGroup>
         <Label>Product Image</Label>
-        <Input 
-          type="file" 
-          accept="image/*" 
-          onChange={handleImageChange} 
-          required={!formData.image} 
+        <Input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          required={!formData.image}
         />
         {formData.image && !imageFile && (
           <ImagePreview src={formData.image} alt="Preview" />
         )}
-        {imageFile && (
-          <p>New image selected: {imageFile.name}</p>
-        )}
+        {imageFile && <p>New image selected: {imageFile.name}</p>}
       </FormGroup>
       <Button type="submit" disabled={loading}>
-        {loading ? 'Saving...' : buttonText}
+        {loading ? "Saving..." : buttonText}
       </Button>
     </Form>
   );
